@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import pe.edu.cibertec.erpCliente.entity.enums.TipoPersona;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -46,5 +47,5 @@ public class TipoDocumento {
     @OneToMany(mappedBy = "tipoDocumento")
     private List<Cliente> clientes;
     
-    //Mensaje prueba
+ 
 }

@@ -29,6 +29,7 @@ public class Segmento {
     private String descripcion;
 
     @Column(name = "activo", nullable = false)
+    @Builder.Default
     private Boolean activo = true; // 1=Activo, 0=Inactivo
     
     @Column(name = "ultima_actualizacion", insertable = false, updatable = false)
