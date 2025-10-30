@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import pe.edu.cibertec.erpCliente.api.request.SegmentoRequestDto;
 import pe.edu.cibertec.erpCliente.api.response.SegmentoResponseDto;
 import pe.edu.cibertec.erpCliente.entity.Segmento;
+import pe.edu.cibertec.erpCliente.exception.BusinessException;
 import pe.edu.cibertec.erpCliente.mapper.SegmentoMapper;
 import pe.edu.cibertec.erpCliente.repository.SegmentoRepository;
 import pe.edu.cibertec.erpCliente.repository.ClienteRepository;
@@ -39,7 +40,7 @@ public class SegmentoServiceImpl implements SegmentoService {
 		
 		// --- 2. VALIDACIÓN DE NEGOCIO ---
 		if(segmentoRepo.existsByNombreIgnoreCase(nombreLimpio)) {
-			throw new RuntimeException("El nombre del segmento ya existe: " + nombreLimpio);
+			throw new BusinessException("El nombre del segmento ya existe: " + nombreLimpio);
 		}
 		
 		// --- 3 --- MAPEO (Request DTO -> Entidad) ---
@@ -100,12 +101,12 @@ public class SegmentoServiceImpl implements SegmentoService {
 	public void eliminar(Short id) {
 		log.info("Eliminando segmento con Id={}", id);
 		Segmento segmentoActual = segmentoRepo.findById(id)
-				.orElseThrow(() -> new RuntimeException("Segmento no encontrado: " + id));
+				.orElseThrow(() -> new BusinessException("Segmento no encontrado: " + id));
 	
 		
 		long clientesVinculados = clienteRepository.countBySegmentoSegmentoId(id);
         if (clientesVinculados > 0) {
-            throw new RuntimeException("No se puede eliminar el segmento: tiene " 
+            throw new BusinessException("No se puede eliminar el segmento: tiene " 
                                      + clientesVinculados + " cliente(s) asociado(s).");
         }
         

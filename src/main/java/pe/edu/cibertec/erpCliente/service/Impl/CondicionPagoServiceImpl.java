@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import pe.edu.cibertec.erpCliente.api.request.CondicionPagoRequestDto;
 import pe.edu.cibertec.erpCliente.api.response.CondicionPagoResponseDto;
 import pe.edu.cibertec.erpCliente.entity.CondicionPago;
+import pe.edu.cibertec.erpCliente.exception.BusinessException;
 import pe.edu.cibertec.erpCliente.mapper.CondicionPagoMapper;
 import pe.edu.cibertec.erpCliente.repository.CondicionPagoRepository;
 import pe.edu.cibertec.erpCliente.repository.ClienteRepository;
@@ -34,7 +35,7 @@ public class CondicionPagoServiceImpl implements CondicionPagoService {
 		
 		// --- 2. VALIDACIÓN DE NEGOCIO ---
 		if(condicionPagoRepo.existsByNombreIgnoreCase(nombreLimpio)) {
-			throw new RuntimeException("El nombre de la condicion de pago ya existe: " + nombreLimpio);
+			throw new BusinessException("El nombre de la condicion de pago ya existe: " + nombreLimpio);
 		}
 		
 		// --- 3 --- MAPEO (Request DTO -> Entidad) ---
@@ -58,7 +59,7 @@ public class CondicionPagoServiceImpl implements CondicionPagoService {
 		
 		//--- 1. OBTENER LA ENTIDAD ACTUAL DESDE LA BD ---
 		CondicionPago condicionPagoActual = condicionPagoRepo.findById(id)
-				.orElseThrow(() -> new RuntimeException("Condicion de pago no encontrada con id: " + id));
+				.orElseThrow(() -> new BusinessException("Condicion de pago no encontrada con id: " + id));
 		
 		//--- 2. NORMALIZACIONES ---
 		String nombreLimpio = req.getNombre().trim();
@@ -66,7 +67,7 @@ public class CondicionPagoServiceImpl implements CondicionPagoService {
 		//--- 3. VALIDACIÓN DE UNICIDAD ---
 		Boolean nombreCambiado = !condicionPagoActual.getNombre().equalsIgnoreCase(nombreLimpio);
 		if(nombreCambiado && condicionPagoRepo.existsByNombreIgnoreCase(nombreLimpio)) {
-			throw new RuntimeException("El nombre de la condicion de pago ya existe: " + nombreLimpio);
+			throw new BusinessException("El nombre de la condicion de pago ya existe: " + nombreLimpio);
 		}
 		
 		//--- 4. MAPEO (DTO -> Entidad Existente) ---
@@ -87,11 +88,11 @@ public class CondicionPagoServiceImpl implements CondicionPagoService {
 	public void eliminar(Short id) {
 		log.info("Eliminando condicion de pago id={}", id);
 		CondicionPago condicionPagoActual = condicionPagoRepo.findById(id)
-				.orElseThrow(() -> new RuntimeException("Condicion de pago no encontrado con id: " + id));
+				.orElseThrow(() -> new BusinessException("Condicion de pago no encontrado con id: " + id));
 		
 		long cantidadClientesAsociados = clienteRepository.countByCondicionPago_CondicionPagoId(id);
 		if(cantidadClientesAsociados > 0) {
-			throw new RuntimeException("No se puede eliminar la condicion de pago id=" + id + " porque tiene " + cantidadClientesAsociados + " clientes asociados.");
+			throw new BusinessException("No se puede eliminar la condicion de pago id=" + id + " porque tiene " + cantidadClientesAsociados + " clientes asociados.");
 		}
 		
 		// Si pasa la validación, procedo a eliminar
@@ -104,7 +105,7 @@ public class CondicionPagoServiceImpl implements CondicionPagoService {
 		log.info("Obteniendo condicion de pago id={}", id);
 		
 		CondicionPago condicionPagoBuscado = condicionPagoRepo.findById(id)
-				.orElseThrow(() -> new RuntimeException("Condicion de pago no encontrado con id: " + id));
+				.orElseThrow(() -> new BusinessException("Condicion de pago no encontrado con id: " + id));
 		return mapper.toResponseDto(condicionPagoBuscado);
 	}
 
