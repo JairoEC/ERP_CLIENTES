@@ -15,7 +15,6 @@ public interface ClienteContactoMapper {
             @Mapping(source = "origenContacto.id", target = "origenContactoId"),
             @Mapping(source = "origenContacto.nombre", target = "origenContactoNombre")
     })
-
     ClienteContactoResponseDto toResponseDto(ClienteContacto entity);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
