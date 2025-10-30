@@ -25,7 +25,7 @@ public interface ClienteMapper {
     @Named("tipoDocumentoRef")
     default TipoDocumento mapTipoDocumentoRef(Short tipoDocId){
         if(tipoDocId == null) return null;
-        return TipoDocumento.builder().id(tipoDocId).build();
+        return TipoDocumento.builder().tipoDocumentoId(tipoDocId).build();
     }
     @Named("segmentoRef")
     default Segmento mapSegmentoRef(Short segmentoId){
