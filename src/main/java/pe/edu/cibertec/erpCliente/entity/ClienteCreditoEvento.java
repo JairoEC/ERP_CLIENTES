@@ -1,8 +1,6 @@
 package pe.edu.cibertec.erpCliente.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,10 +17,12 @@ import java.util.Date;
 public class ClienteCreditoEvento {
     @Id
     private Integer evento_id;
-    private Integer cliente_id;
     private Date fecha;
     private String accion;
     private String detalle;
     private String usuario;
     private Date ultima_actualizacion;
+    @ManyToOne
+    @JoinColumn(name = "cliente_id")
+    private Cliente cliente;
 }

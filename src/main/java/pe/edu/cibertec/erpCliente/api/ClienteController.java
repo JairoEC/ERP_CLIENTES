@@ -43,4 +43,10 @@ public class ClienteController {
         service.eliminar(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping
+    public List<ClienteResponseDto> listar(){
+
+        return service.listar();
+    }
 }

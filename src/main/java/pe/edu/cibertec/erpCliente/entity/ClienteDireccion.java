@@ -18,7 +18,7 @@ import java.util.Date;
 public class ClienteDireccion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "cliente_direccion_id")
+    @Column(name = "direccion_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
