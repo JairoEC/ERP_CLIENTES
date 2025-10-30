@@ -45,4 +45,6 @@ public class TipoDocumento {
     
     @OneToMany(mappedBy = "tipoDocumento")
     private List<Cliente> clientes;
+    
+    //Mensaje prueba
 }
