@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import pe.edu.cibertec.erpCliente.entity.enums.Accion;
+import pe.edu.cibertec.erpCliente.entity.enums.AccionEnum;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -20,14 +20,14 @@ public class ClienteCreditoEvento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "evento_id")
-    private Integer evento_id;
+    private Long eventoId;
     
     @Column(name = "fecha")
     private LocalDateTime fecha;
     
     @Enumerated(EnumType.STRING)
     @Column(name = "accion", nullable = false)
-    private Accion accion;
+    private AccionEnum accion;
     
     @Column(name = "detalle", length = 255)
     private String detalle;

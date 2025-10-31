@@ -4,6 +4,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import pe.edu.cibertec.erpCliente.entity.ClienteCreditoEvento;
 
-public interface ClienteCreditoEventoRepository extends JpaRepository<ClienteCreditoEvento, Integer> {
+public interface ClienteCreditoEventoRepository extends JpaRepository<ClienteCreditoEvento, Long> {
+	
 
+
+	
 }
