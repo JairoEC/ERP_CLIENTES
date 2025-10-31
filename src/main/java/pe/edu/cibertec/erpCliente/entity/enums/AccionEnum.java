@@ -1,6 +1,6 @@
 package pe.edu.cibertec.erpCliente.entity.enums;
 
-public enum Accion {
+public enum AccionEnum {
 	ASIGNACION_LINEA,
 	BLOQUEO,
 	DESBLOQUEO,
