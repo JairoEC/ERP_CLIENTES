@@ -11,7 +11,9 @@ import pe.edu.cibertec.erpCliente.api.response.ClienteContactoResponseDto;
 import pe.edu.cibertec.erpCliente.service.ClienteContactoService;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -60,9 +62,14 @@ public class ClienteContactoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> eliminar(@PathVariable Long id) {
         log.info("DELETE /api/clientes-contacto/{}", id);
         service.eliminar(id);
-        return ResponseEntity.noContent().build();
+        
+        Map<String, String> response = new HashMap<>();
+        response.put("mensaje", "Contacto eliminado correctamente");
+        
+        return ResponseEntity.ok(response);
     }
+
 }

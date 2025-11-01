@@ -2,6 +2,8 @@ package pe.edu.cibertec.erpCliente.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import pe.edu.cibertec.erpCliente.entity.enums.TipoDireccion;
+
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;

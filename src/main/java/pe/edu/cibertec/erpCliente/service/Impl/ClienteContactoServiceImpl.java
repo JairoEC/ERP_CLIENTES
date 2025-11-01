@@ -10,6 +10,8 @@ import pe.edu.cibertec.erpCliente.api.response.ClienteContactoResponseDto;
 import pe.edu.cibertec.erpCliente.entity.CatEtapaContacto;
 import pe.edu.cibertec.erpCliente.entity.CatOrigenContacto;
 import pe.edu.cibertec.erpCliente.entity.ClienteContacto;
+import pe.edu.cibertec.erpCliente.exception.NotFoundException;
+import pe.edu.cibertec.erpCliente.exception.BusinessException;
 import pe.edu.cibertec.erpCliente.mapper.ClienteContactoMapper;
 import pe.edu.cibertec.erpCliente.repository.ClienteContactoRepository;
 import pe.edu.cibertec.erpCliente.repository.ClienteRepository;
@@ -27,13 +29,12 @@ public class ClienteContactoServiceImpl implements ClienteContactoService {
     private final ClienteContactoMapper mapper;
     private final EntityManager entityManager;
 
-
     @Override
     public ClienteContactoResponseDto crear(ClienteContactoRequestDto request) {
         log.info("Creando contacto para clienteId={}", request.getClienteId());
 
         var cliente = clienteRepo.findById(request.getClienteId())
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado con id: " + request.getClienteId()));
+                .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + request.getClienteId()));
 
         ClienteContacto contacto = mapper.toEntity(request);
         contacto.setCliente(cliente);
@@ -58,19 +59,18 @@ public class ClienteContactoServiceImpl implements ClienteContactoService {
         return mapper.toResponseDto(guardado);
     }
 
-
     @Override
     public ClienteContactoResponseDto actualizar(Long id, ClienteContactoRequestDto request) {
         log.info("Actualizando contacto id={}", id);
 
         ClienteContacto contactoActual = clienteContactoRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Contacto no encontrado con id: " + id));
+                .orElseThrow(() -> new NotFoundException("Contacto no encontrado con id: " + id));
 
         mapper.updateEntityFromDto(request, contactoActual);
 
         if (request.getClienteId() != null) {
             var cliente = clienteRepo.findById(request.getClienteId())
-                    .orElseThrow(() -> new RuntimeException("Cliente no encontrado con id: " + request.getClienteId()));
+                    .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + request.getClienteId()));
             contactoActual.setCliente(cliente);
         }
 
@@ -94,7 +94,6 @@ public class ClienteContactoServiceImpl implements ClienteContactoService {
         log.debug("Contacto actualizado id={}", actualizado.getId());
 
         entityManager.flush();
-
         entityManager.refresh(actualizado);
 
         return mapper.toResponseDto(actualizado);
@@ -105,7 +104,7 @@ public class ClienteContactoServiceImpl implements ClienteContactoService {
         log.info("Eliminando contacto id={}", id);
 
         ClienteContacto contacto = clienteContactoRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Contacto no encontrado con id: " + id));
+                .orElseThrow(() -> new NotFoundException("Contacto no encontrado con id: " + id));
 
         clienteContactoRepo.delete(contacto);
     }
@@ -116,7 +115,7 @@ public class ClienteContactoServiceImpl implements ClienteContactoService {
         log.info("Obteniendo contacto id={}", id);
 
         ClienteContacto contacto = clienteContactoRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Contacto no encontrado con id: " + id));
+                .orElseThrow(() -> new NotFoundException("Contacto no encontrado con id: " + id));
 
         return mapper.toResponseDto(contacto);
     }

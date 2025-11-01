@@ -1,21 +1,15 @@
 package pe.edu.cibertec.erpCliente.service.Impl;
 
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pe.edu.cibertec.erpCliente.api.request.ClienteContactoRequestDto;
 import pe.edu.cibertec.erpCliente.api.request.ClienteDireccionRequestDto;
-import pe.edu.cibertec.erpCliente.api.response.ClienteContactoResponseDto;
 import pe.edu.cibertec.erpCliente.api.response.ClienteDireccionResponseDto;
-import pe.edu.cibertec.erpCliente.entity.CatEtapaContacto;
-import pe.edu.cibertec.erpCliente.entity.CatOrigenContacto;
-import pe.edu.cibertec.erpCliente.entity.ClienteContacto;
 import pe.edu.cibertec.erpCliente.entity.ClienteDireccion;
-import pe.edu.cibertec.erpCliente.mapper.ClienteContactoMapper;
+import pe.edu.cibertec.erpCliente.entity.enums.TipoDireccion;
+import pe.edu.cibertec.erpCliente.exception.NotFoundException;
 import pe.edu.cibertec.erpCliente.mapper.ClienteDireccionMapper;
-import pe.edu.cibertec.erpCliente.repository.ClienteContactoRepository;
 import pe.edu.cibertec.erpCliente.repository.ClienteDireccionRepository;
 import pe.edu.cibertec.erpCliente.repository.ClienteRepository;
 import pe.edu.cibertec.erpCliente.service.ClienteDireccionService;
@@ -27,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class ClienteDireccionServiceImpl implements ClienteDireccionService {
+
     private final ClienteDireccionRepository clienteDireccionRepo;
     private final ClienteRepository clienteRepo;
     private final ClienteDireccionMapper mapper;
@@ -35,9 +30,10 @@ public class ClienteDireccionServiceImpl implements ClienteDireccionService {
     public ClienteDireccionResponseDto crear(ClienteDireccionRequestDto request) {
         log.info("Creando dirección para clienteId={}", request.getClienteId());
 
-        var cliente = clienteRepo.findById(request.getClienteId())
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado con id: " + request.getClienteId()));
+        validarTipoDireccion(request.getTipo());
 
+        var cliente = clienteRepo.findById(request.getClienteId())
+                .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + request.getClienteId()));
 
         ClienteDireccion direccion = mapper.toEntity(request);
         direccion.setCliente(cliente);
@@ -52,14 +48,16 @@ public class ClienteDireccionServiceImpl implements ClienteDireccionService {
     public ClienteDireccionResponseDto actualizar(Long id, ClienteDireccionRequestDto request) {
         log.info("Actualizando dirección id={}", id);
 
+        validarTipoDireccion(request.getTipo());
+
         ClienteDireccion direccionActual = clienteDireccionRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Dirección no encontrada con id: " + id));
+                .orElseThrow(() -> new NotFoundException("Dirección no encontrada con id: " + id));
 
         mapper.updateEntityFromDto(request, direccionActual);
 
         if (request.getClienteId() != null) {
             var cliente = clienteRepo.findById(request.getClienteId())
-                    .orElseThrow(() -> new RuntimeException("Cliente no encontrado con id: " + request.getClienteId()));
+                    .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + request.getClienteId()));
             direccionActual.setCliente(cliente);
         }
 
@@ -73,7 +71,7 @@ public class ClienteDireccionServiceImpl implements ClienteDireccionService {
         log.info("Eliminando dirección id={}", id);
 
         ClienteDireccion direccion = clienteDireccionRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Dirección no encontrada con id: " + id));
+                .orElseThrow(() -> new NotFoundException("Dirección no encontrada con id: " + id));
 
         clienteDireccionRepo.delete(direccion);
     }
@@ -84,7 +82,7 @@ public class ClienteDireccionServiceImpl implements ClienteDireccionService {
         log.info("Obteniendo dirección id={}", id);
 
         ClienteDireccion direccion = clienteDireccionRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Dirección no encontrada con id: " + id));
+                .orElseThrow(() -> new NotFoundException("Dirección no encontrada con id: " + id));
 
         return mapper.toResponseDto(direccion);
     }
@@ -104,5 +102,18 @@ public class ClienteDireccionServiceImpl implements ClienteDireccionService {
         return clienteDireccionRepo.findAll().stream()
                 .map(mapper::toResponseDto)
                 .toList();
+    }
+
+    private void validarTipoDireccion(String tipo) {
+        if (tipo == null || tipo.isBlank()) {
+            throw new IllegalArgumentException("El tipo de dirección no puede estar vacío.");
+        }
+
+        try {
+            TipoDireccion.valueOf(tipo.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Tipo de dirección no válido: '" + tipo +
+                    "'. Valores permitidos: FACTURACION, ENVIO, PERSONAL, OTRO");
+        }
     }
 }

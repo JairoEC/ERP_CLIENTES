@@ -1,4 +1,4 @@
-package pe.edu.cibertec.erpCliente.entity;
+package pe.edu.cibertec.erpCliente.entity.enums;
 
 public enum TipoDireccion {
     FACTURACION,
