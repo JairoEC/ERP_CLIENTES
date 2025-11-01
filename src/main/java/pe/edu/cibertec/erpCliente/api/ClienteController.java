@@ -46,7 +46,7 @@ public class ClienteController {
 
     @GetMapping
     public List<ClienteResponseDto> listar(){
-
+        log.info("GET /api/clientes Listar clientes");
         return service.listar();
     }
 }
