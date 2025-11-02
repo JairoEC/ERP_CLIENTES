@@ -7,9 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 import pe.edu.cibertec.erpCliente.api.request.TipoDocumentoRequestDto;
 import pe.edu.cibertec.erpCliente.api.response.TipoDocumentoResponseDto;
 import pe.edu.cibertec.erpCliente.entity.TipoDocumento;
+import pe.edu.cibertec.erpCliente.exception.NotFoundException;
 import pe.edu.cibertec.erpCliente.mapper.TipoDocumentoMapper;
 import pe.edu.cibertec.erpCliente.repository.TipoDocumentoRepository;
 import pe.edu.cibertec.erpCliente.service.TipoDocumentoService;
+
+import java.net.http.HttpResponse;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -32,22 +36,29 @@ public class TipoDocumentoServiceImpl implements TipoDocumentoService {
     @Override
     public TipoDocumentoResponseDto actualizar(Short id, TipoDocumentoRequestDto request) {
         log.info("Actualizando tipo de documento id: {}",id);
-
-        return null;
+        TipoDocumento entity = mapper.toEntity(request);
+        entity.setTipoDocumentoId(id);
+        TipoDocumento saved = tipoDocumentoRepository.save(entity);
+        return mapper.toResponseDto(saved);
     }
 
     @Override
-    public void eliminar(Integer id) {
-
+    public void eliminar(Short id) {
+        tipoDocumentoRepository.deleteById(id);
     }
 
     @Override
+    @Transactional
     public TipoDocumentoResponseDto obtener(Short id) {
-        return null;
+        TipoDocumento entity = tipoDocumentoRepository.findById(id)
+                .orElseThrow(()-> new NotFoundException("Documento no encontrado id: "+id));
+        return mapper.toResponseDto(entity);
     }
 
     @Override
-    public TipoDocumentoResponseDto listar() {
-        return null;
+    public List<TipoDocumentoResponseDto> listar() {
+        return tipoDocumentoRepository.findAll().stream()
+                .map(mapper::toResponseDto)
+                .toList();
     }
 }
