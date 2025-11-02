@@ -1,6 +1,7 @@
 package pe.edu.cibertec.erpCliente.api.response;
 
 import lombok.*;
+import pe.edu.cibertec.erpCliente.entity.enums.TipoDireccionEnum;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +15,8 @@ public class ClienteDireccionResponseDto {
     private Long id;
     private Integer clienteId;
 
-    private String tipo;
+    private TipoDireccionEnum tipo;
+    
     private String direccion;
     private String referencia;
     private String ubigeo;

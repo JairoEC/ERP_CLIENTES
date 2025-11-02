@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import pe.edu.cibertec.erpCliente.api.request.ClienteCreditoEventoRequestDto;
 import pe.edu.cibertec.erpCliente.api.response.ClienteCreditoEventoResponseDto;
 import pe.edu.cibertec.erpCliente.service.ClienteCreditoEventoService;
-import pe.edu.cibertec.erpCliente.service.SegmentoService;
 
 @Slf4j
 @RestController

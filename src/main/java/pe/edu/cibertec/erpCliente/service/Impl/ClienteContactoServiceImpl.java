@@ -9,6 +9,7 @@ import pe.edu.cibertec.erpCliente.api.request.ClienteContactoRequestDto;
 import pe.edu.cibertec.erpCliente.api.response.ClienteContactoResponseDto;
 import pe.edu.cibertec.erpCliente.entity.ClienteContacto;
 import pe.edu.cibertec.erpCliente.exception.BusinessException;
+import pe.edu.cibertec.erpCliente.exception.NotFoundException;
 import pe.edu.cibertec.erpCliente.mapper.ClienteContactoMapper;
 import pe.edu.cibertec.erpCliente.repository.ClienteContactoRepository;
 import pe.edu.cibertec.erpCliente.repository.ClienteRepository;
@@ -52,7 +53,7 @@ public class ClienteContactoServiceImpl implements ClienteContactoService {
         log.info("Actualizando contacto id={}", id);
 
         ClienteContacto contactoActual = clienteContactoRepo.findById(id)
-                .orElseThrow(() -> new BusinessException("Contacto no encontrado con id: " + id));
+                .orElseThrow(() -> new NotFoundException("Contacto no encontrado con id: " + id));
 
         if(request.getEmail()!=null && !request.getEmail().isEmpty()) {
         	if (clienteContactoRepo.existsByClienteAndEmailAndContactoIdNot(
@@ -82,7 +83,7 @@ public class ClienteContactoServiceImpl implements ClienteContactoService {
         log.info("Eliminando contacto id={}", id);
 
         ClienteContacto contacto = clienteContactoRepo.findById(id)
-                .orElseThrow(() -> new BusinessException("Contacto no encontrado con id: " + id));
+                .orElseThrow(() -> new NotFoundException("Contacto no encontrado con id: " + id));
 
      // Regla de negocio: No se puede borrar un contacto principal
         if (contacto.isEsPrincipal()) {
@@ -100,7 +101,7 @@ public class ClienteContactoServiceImpl implements ClienteContactoService {
         log.info("Obteniendo contacto id={}", id);
 
         ClienteContacto contacto = clienteContactoRepo.findById(id)
-                .orElseThrow(() -> new BusinessException("Contacto no encontrado con id: " + id));
+                .orElseThrow(() -> new NotFoundException("Contacto no encontrado con id: " + id));
 
         return mapper.toResponseDto(contacto);
     }

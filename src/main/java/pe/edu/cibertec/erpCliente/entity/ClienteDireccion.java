@@ -2,12 +2,12 @@ package pe.edu.cibertec.erpCliente.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import pe.edu.cibertec.erpCliente.entity.enums.TipoDireccion;
+import pe.edu.cibertec.erpCliente.entity.enums.TipoDireccionEnum;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Table(name = "cliente_direccion")
@@ -23,47 +23,51 @@ public class ClienteDireccion {
     @Column(name = "direccion_id")
     private Long id;
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id", nullable = false,
             foreignKey = @ForeignKey(name = "fk_cli_dir_cliente"))
     private Cliente cliente;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private TipoDireccion tipo = TipoDireccion.PERSONAL;
+    @Column(name="tipo",nullable = false)
+    @Builder.Default
+    private TipoDireccionEnum tipo = TipoDireccionEnum.ENVIO;
 
-    @Column(nullable = false, length = 200)
+    @Column(name="direccion", nullable = false, length = 200)
     private String direccion;
 
-    @Column(length = 200)
+    @Column(name="referencia",length = 200)
     private String referencia;
 
-    @Column(length = 6)
+    @Column(name="ubigeo",length = 6)
     private String ubigeo;
 
-    @Column(length = 80)
+    @Column(name="distrito",length = 80)
     private String distrito;
 
-    @Column(length = 80)
+    @Column(name="provincia",length = 80)
     private String provincia;
 
-    @Column(length = 80)
+    @Column(name="departamento",length = 80)
     private String departamento;
 
-    @Column(length = 80)
+    @Column(name="pais",length = 80)
+    @Builder.Default
     private String pais = "PERU";
 
     @Column(name = "es_principal", nullable = false)
+    @Builder.Default
     private boolean esPrincipal = false;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean activo = true;
-
-    @Column(name = "creado_en", insertable = false, updatable = false,
-            columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    
+    @CreationTimestamp 
+    @Column(name = "creado_en", updatable = false, nullable = false)
     private LocalDateTime creadoEn;
 
-    @Column(name = "ultima_actualizacion", nullable = false)
-    @UpdateTimestamp
+    @UpdateTimestamp 	@Column(name = "ultima_actualizacion", insertable = false, updatable = false)
     private LocalDateTime ultimaActualizacion;
 }

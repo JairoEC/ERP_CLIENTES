@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import jakarta.persistence.EntityManager;
 import pe.edu.cibertec.erpCliente.api.request.ClienteDireccionRequestDto;
 import pe.edu.cibertec.erpCliente.api.response.ClienteDireccionResponseDto;
+import pe.edu.cibertec.erpCliente.entity.Cliente;
 import pe.edu.cibertec.erpCliente.entity.ClienteDireccion;
-import pe.edu.cibertec.erpCliente.entity.enums.TipoDireccion;
-import pe.edu.cibertec.erpCliente.exception.NotFoundException;
+import pe.edu.cibertec.erpCliente.exception.BusinessException;
 import pe.edu.cibertec.erpCliente.mapper.ClienteDireccionMapper;
 import pe.edu.cibertec.erpCliente.repository.ClienteDireccionRepository;
 import pe.edu.cibertec.erpCliente.repository.ClienteRepository;
@@ -25,19 +27,22 @@ public class ClienteDireccionServiceImpl implements ClienteDireccionService {
     private final ClienteDireccionRepository clienteDireccionRepo;
     private final ClienteRepository clienteRepo;
     private final ClienteDireccionMapper mapper;
-
+    private final EntityManager entityManager;
+    
     @Override
     public ClienteDireccionResponseDto crear(ClienteDireccionRequestDto request) {
         log.info("Creando dirección para clienteId={}", request.getClienteId());
 
-        validarTipoDireccion(request.getTipo());
-
-        var cliente = clienteRepo.findById(request.getClienteId())
-                .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + request.getClienteId()));
-
+        Cliente cliente = clienteRepo.findById(request.getClienteId())
+				.orElseThrow(() -> new BusinessException("Cliente no encontrado con id: " + request.getClienteId()));
+        
+       
         ClienteDireccion direccion = mapper.toEntity(request);
+        
         direccion.setCliente(cliente);
+        direccion.setActivo(true); 
 
+     
         ClienteDireccion guardado = clienteDireccionRepo.save(direccion);
         log.debug("Dirección creada id={}", guardado.getId());
 
@@ -48,53 +53,54 @@ public class ClienteDireccionServiceImpl implements ClienteDireccionService {
     public ClienteDireccionResponseDto actualizar(Long id, ClienteDireccionRequestDto request) {
         log.info("Actualizando dirección id={}", id);
 
-        validarTipoDireccion(request.getTipo());
-
         ClienteDireccion direccionActual = clienteDireccionRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException("Dirección no encontrada con id: " + id));
+                .orElseThrow(() -> new BusinessException("Dirección no encontrada con id: " + id));
 
+        
         mapper.updateEntityFromDto(request, direccionActual);
-
-        if (request.getClienteId() != null) {
-            var cliente = clienteRepo.findById(request.getClienteId())
-                    .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + request.getClienteId()));
-            direccionActual.setCliente(cliente);
-        }
 
         ClienteDireccion actualizado = clienteDireccionRepo.save(direccionActual);
         log.debug("Dirección actualizada id={}", actualizado.getId());
+        entityManager.flush();
+        entityManager.refresh(actualizado);
+                
         return mapper.toResponseDto(actualizado);
+        
     }
 
+    //--  ELIMINAR  --//
     @Override
     public void eliminar(Long id) {
         log.info("Eliminando dirección id={}", id);
 
         ClienteDireccion direccion = clienteDireccionRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException("Dirección no encontrada con id: " + id));
+                .orElseThrow(() -> new BusinessException("Dirección no encontrada con id: " + id));
 
         clienteDireccionRepo.delete(direccion);
     }
 
+    //--  OBTENER  --//
     @Override
     @Transactional(readOnly = true)
     public ClienteDireccionResponseDto obtener(Long id) {
         log.info("Obteniendo dirección id={}", id);
 
         ClienteDireccion direccion = clienteDireccionRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException("Dirección no encontrada con id: " + id));
+                .orElseThrow(() -> new BusinessException("Dirección no encontrada con id: " + id));
 
         return mapper.toResponseDto(direccion);
     }
 
+    //-- LISTAR POR CLIENTE --//
     @Override
     @Transactional(readOnly = true)
-    public List<ClienteDireccionResponseDto> listarPorCliente(Integer clienteId) {
+    public List<ClienteDireccionResponseDto> listarPorCliente(Long clienteId) {
         log.info("Listando direcciones por clienteId={}", clienteId);
-        List<ClienteDireccion> direcciones = clienteDireccionRepo.findByClienteClienteId(clienteId);
+        List<ClienteDireccion> direcciones = clienteDireccionRepo.findByCliente_ClienteId(clienteId);
         return direcciones.stream().map(mapper::toResponseDto).toList();
     }
 
+    //-- LISTAR TODOS --//
     @Override
     @Transactional(readOnly = true)
     public List<ClienteDireccionResponseDto> listar() {
@@ -104,16 +110,5 @@ public class ClienteDireccionServiceImpl implements ClienteDireccionService {
                 .toList();
     }
 
-    private void validarTipoDireccion(String tipo) {
-        if (tipo == null || tipo.isBlank()) {
-            throw new IllegalArgumentException("El tipo de dirección no puede estar vacío.");
-        }
 
-        try {
-            TipoDireccion.valueOf(tipo.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Tipo de dirección no válido: '" + tipo +
-                    "'. Valores permitidos: FACTURACION, ENVIO, PERSONAL, OTRO");
-        }
-    }
 }

@@ -1,8 +1,7 @@
 package pe.edu.cibertec.erpCliente.entity.enums;
 
-public enum TipoDireccion {
-    FACTURACION,
+public enum TipoDireccionEnum {
+	FISCAL,
     ENVIO,
-    PERSONAL,
     OTRO
 }

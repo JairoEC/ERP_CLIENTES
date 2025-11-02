@@ -10,6 +10,8 @@ public interface ClienteDireccionService {
     ClienteDireccionResponseDto actualizar(Long id, ClienteDireccionRequestDto request);
     void eliminar(Long id);
     ClienteDireccionResponseDto obtener(Long id);
-    List<ClienteDireccionResponseDto> listarPorCliente(Integer clienteId);
+    List<ClienteDireccionResponseDto> listarPorCliente(Long clienteId);
     List<ClienteDireccionResponseDto> listar();
+    
+
 }
