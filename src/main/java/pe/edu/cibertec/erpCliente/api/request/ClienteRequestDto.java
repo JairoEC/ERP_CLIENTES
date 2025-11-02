@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import pe.edu.cibertec.erpCliente.entity.Segmento;
 
+import java.util.Date;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,5 +24,9 @@ public class ClienteRequestDto {
     private String email;
     private String telefono;
     private Short segmento;
-
+    private Short condicionPago;
+    private String monedaCredito;
+    private Double lineaCredito;
+    private Boolean activo;
+    private Short bloqueadoCredito;
 }

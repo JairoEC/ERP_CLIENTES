@@ -22,7 +22,7 @@ public class TipoDocumentoController {
     private final TipoDocumentoService service;
 
     @PostMapping
-    public ResponseEntity<TipoDocumentoResponseDto> crear(TipoDocumentoRequestDto rq){
+    public ResponseEntity<TipoDocumentoResponseDto> crear(@RequestBody TipoDocumentoRequestDto rq){
         TipoDocumentoResponseDto saved = service.crear(rq);
         return ResponseEntity
                 .created(URI.create("/api/tipodocumento"+saved.getCodigo()))
@@ -39,6 +39,7 @@ public class TipoDocumentoController {
         return service.actualizar(id,request);
     }
 
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Short id){
         service.eliminar(id);
         return ResponseEntity.noContent().build();

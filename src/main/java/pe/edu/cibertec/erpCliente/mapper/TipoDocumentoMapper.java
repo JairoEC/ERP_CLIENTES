@@ -9,8 +9,10 @@ import pe.edu.cibertec.erpCliente.entity.TipoDocumento;
 public interface TipoDocumentoMapper {
     TipoDocumento toEntity(TipoDocumentoRequestDto dto);
 
+    @Mapping(source = "tipoDocumentoId", target = "id")
     TipoDocumentoResponseDto toResponseDto(TipoDocumento entity);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntityFromDto(TipoDocumentoRequestDto dto, @MappingTarget TipoDocumento entity);
+
 }

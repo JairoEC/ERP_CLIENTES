@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class TipoDocumentoRequestDto {
     private String codigo;
     private String nombre;
+    private String tipoPersona;
 }

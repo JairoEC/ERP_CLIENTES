@@ -3,6 +3,7 @@ package pe.edu.cibertec.erpCliente.api;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.sql.Delete;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.cibertec.erpCliente.api.request.ClienteRequestDto;
@@ -39,6 +40,7 @@ public class ClienteController {
         return service.actualizar(id,request);
     }
 
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Integer id){
         service.eliminar(id);
         return ResponseEntity.noContent().build();

@@ -20,6 +20,8 @@ import pe.edu.cibertec.erpCliente.service.ClienteService;
 import pe.edu.cibertec.erpCliente.service.SegmentoService;
 
 import javax.swing.text.Segment;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -47,6 +49,11 @@ public class ClienteServiceImpl implements ClienteService {
         Segmento segm = segmentoRepository.findById(request.getSegmento())
                 .orElseThrow(()-> new NotFoundException("Tipo de segmento no encontrado: "+request.getSegmento()));
         Cliente entity = mapper.toEntity(request);
+        LocalDateTime ahora = LocalDateTime.now();
+        entity.setCreadoEn(ahora);
+        entity.setUltimaActualizacion(ahora);
+        entity.setActivo(true);
+        entity.setBloqueadoCredito(false);
         entity.setSegmento(segm);
 
         Cliente saved = clienteRepository.save(entity);
