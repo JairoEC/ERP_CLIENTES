@@ -10,6 +10,8 @@ public interface ClienteContactoService {
     ClienteContactoResponseDto actualizar(Long id, ClienteContactoRequestDto request);
     void eliminar(Long id);
     ClienteContactoResponseDto obtener(Long id);
-    List<ClienteContactoResponseDto> listarPorCliente(Integer clienteId);
+    List<ClienteContactoResponseDto> listarPorCliente(Long clienteId);
     List<ClienteContactoResponseDto> listar();
+    
+    
 }

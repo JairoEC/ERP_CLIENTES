@@ -31,7 +31,7 @@ public class ClienteContactoController {
         ClienteContactoResponseDto contactoGuardado = service.crear(request);
 
         URI location = uri.path("/api/clientes-contacto/{id}")
-                .buildAndExpand(contactoGuardado.getId())
+                .buildAndExpand(contactoGuardado.getContactoId())
                 .toUri();
 
         return ResponseEntity.created(location).body(contactoGuardado);

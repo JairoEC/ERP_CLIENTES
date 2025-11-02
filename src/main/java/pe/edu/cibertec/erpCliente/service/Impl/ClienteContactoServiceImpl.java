@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pe.edu.cibertec.erpCliente.api.request.ClienteContactoRequestDto;
 import pe.edu.cibertec.erpCliente.api.response.ClienteContactoResponseDto;
-import pe.edu.cibertec.erpCliente.entity.CatEtapaContacto;
-import pe.edu.cibertec.erpCliente.entity.CatOrigenContacto;
 import pe.edu.cibertec.erpCliente.entity.ClienteContacto;
-import pe.edu.cibertec.erpCliente.exception.NotFoundException;
 import pe.edu.cibertec.erpCliente.exception.BusinessException;
 import pe.edu.cibertec.erpCliente.mapper.ClienteContactoMapper;
 import pe.edu.cibertec.erpCliente.repository.ClienteContactoRepository;
@@ -29,105 +26,95 @@ public class ClienteContactoServiceImpl implements ClienteContactoService {
     private final ClienteContactoMapper mapper;
     private final EntityManager entityManager;
 
+    //--  CREAR  --//
     @Override
     public ClienteContactoResponseDto crear(ClienteContactoRequestDto request) {
         log.info("Creando contacto para clienteId={}", request.getClienteId());
 
         var cliente = clienteRepo.findById(request.getClienteId())
-                .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + request.getClienteId()));
+                .orElseThrow(() -> new BusinessException("Cliente no encontrado con id: " + request.getClienteId()));
 
         ClienteContacto contacto = mapper.toEntity(request);
+        
         contacto.setCliente(cliente);
-
-        if (request.getEtapaContactoId() != null) {
-            contacto.setEtapaContacto(
-                    entityManager.getReference(CatEtapaContacto.class, request.getEtapaContactoId())
-            );
-        }
-
-        if (request.getOrigenContactoId() != null) {
-            contacto.setOrigenContacto(
-                    entityManager.getReference(CatOrigenContacto.class, request.getOrigenContactoId())
-            );
-        }
-
+        contacto.setActivo(true);
+  
         ClienteContacto guardado = clienteContactoRepo.save(contacto);
-        log.debug("Contacto creado id={}", guardado.getId());
+        log.debug("Contacto creado id={}", guardado.getContactoId());
 
-        entityManager.refresh(guardado);
 
         return mapper.toResponseDto(guardado);
     }
 
+    //--  ACTUALIZAR  --//
     @Override
     public ClienteContactoResponseDto actualizar(Long id, ClienteContactoRequestDto request) {
         log.info("Actualizando contacto id={}", id);
 
         ClienteContacto contactoActual = clienteContactoRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException("Contacto no encontrado con id: " + id));
+                .orElseThrow(() -> new BusinessException("Contacto no encontrado con id: " + id));
 
+        if(request.getEmail()!=null && !request.getEmail().isEmpty()) {
+        	if (clienteContactoRepo.existsByClienteAndEmailAndContactoIdNot(
+        			contactoActual.getCliente(), request.getEmail(), id)) {
+                throw new BusinessException("El email '" + request.getEmail() + "' ya está en uso por otro contacto.");
+            }
+        }
+        
+   
         mapper.updateEntityFromDto(request, contactoActual);
 
-        if (request.getClienteId() != null) {
-            var cliente = clienteRepo.findById(request.getClienteId())
-                    .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + request.getClienteId()));
-            contactoActual.setCliente(cliente);
-        }
 
-        if (request.getEtapaContactoId() != null) {
-            contactoActual.setEtapaContacto(
-                    entityManager.getReference(CatEtapaContacto.class, request.getEtapaContactoId())
-            );
-        } else {
-            contactoActual.setEtapaContacto(null);
-        }
-
-        if (request.getOrigenContactoId() != null) {
-            contactoActual.setOrigenContacto(
-                    entityManager.getReference(CatOrigenContacto.class, request.getOrigenContactoId())
-            );
-        } else {
-            contactoActual.setOrigenContacto(null);
-        }
 
         ClienteContacto actualizado = clienteContactoRepo.save(contactoActual);
-        log.debug("Contacto actualizado id={}", actualizado.getId());
+        log.debug("Contacto actualizado id={}", actualizado.getContactoId());
 
         entityManager.flush();
         entityManager.refresh(actualizado);
 
         return mapper.toResponseDto(actualizado);
     }
+    
+    //--  ELIMINAR  --//
 
     @Override
     public void eliminar(Long id) {
         log.info("Eliminando contacto id={}", id);
 
         ClienteContacto contacto = clienteContactoRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException("Contacto no encontrado con id: " + id));
+                .orElseThrow(() -> new BusinessException("Contacto no encontrado con id: " + id));
 
+     // Regla de negocio: No se puede borrar un contacto principal
+        if (contacto.isEsPrincipal()) {
+            throw new BusinessException("No se puede eliminar un contacto principal. Primero asigne otro contacto como principal.");
+        }
+        
+  
         clienteContactoRepo.delete(contacto);
     }
 
+    //--  OBTENER POR ID --//
     @Override
     @Transactional(readOnly = true)
     public ClienteContactoResponseDto obtener(Long id) {
         log.info("Obteniendo contacto id={}", id);
 
         ClienteContacto contacto = clienteContactoRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException("Contacto no encontrado con id: " + id));
+                .orElseThrow(() -> new BusinessException("Contacto no encontrado con id: " + id));
 
         return mapper.toResponseDto(contacto);
     }
 
+    //--  LISTAR POR CLIENTE  --//
     @Override
     @Transactional(readOnly = true)
-    public List<ClienteContactoResponseDto> listarPorCliente(Integer clienteId) {
+    public List<ClienteContactoResponseDto> listarPorCliente(Long clienteId) {
         log.info("Listando contactos por clienteId={}", clienteId);
         List<ClienteContacto> contactos = clienteContactoRepo.findByClienteClienteId(clienteId);
         return contactos.stream().map(mapper::toResponseDto).toList();
     }
 
+    //--  LISTAR TODOS  --//
     @Override
     @Transactional(readOnly = true)
     public List<ClienteContactoResponseDto> listar() {

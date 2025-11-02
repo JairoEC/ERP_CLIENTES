@@ -11,25 +11,19 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 public class ClienteContactoResponseDto {
-    private Long id;
+    private Long ContactoId;
     private Integer clienteId;
+    
     private String nombres;
     private String apellidos;
     private String cargo;
 
-    private Long etapaContactoId;
-    private String etapaContactoNombre;
-
-    private Long origenContactoId;
-    private String origenContactoNombre;
-
-    private String linkedinUrl;
-    private String zonaHoraria;
-
-    private boolean consentimientoEmail;
-    private boolean consentimientoSms;
+    private String email;
+    private String telefono;
+    
+    private String esPrincipal;    
     private boolean activo;
-
+    
     private LocalDateTime creadoEn;
     private LocalDateTime ultimaActualizacion;
 }

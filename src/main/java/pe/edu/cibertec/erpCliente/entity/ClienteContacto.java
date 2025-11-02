@@ -1,16 +1,24 @@
 package pe.edu.cibertec.erpCliente.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "cliente_contacto")
+@Table(name = "cliente_contacto",
+uniqueConstraints = { 
+    @UniqueConstraint(name = "idx_contacto_email_unico", columnNames = {"cliente_id", "email"}),
+    @UniqueConstraint(name = "idx_contacto_tel_unico", columnNames = {"cliente_id", "telefono"})
+}
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,52 +27,43 @@ public class ClienteContacto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "contacto_id")
-    private Long id;
+    private Long contactoId;
 
-    @Column(nullable = false, length = 100)
+
+    @Column(name ="nombres",nullable = false, length = 80)
     private String nombres;
 
-    @Column(length = 120)
+    @Column(name ="apellidos",length = 80)
     private String apellidos;
 
-    @Column(length = 100)
+    @Column(name ="cargo",length = 80)
     private String cargo;
+    
+    @Email
+    @Column(name ="email", length = 120)
+    private String email;
+    
+    @Column(name ="telefono",length = 30)
+    private String telefono;
+    
+    @Column(name = "es_principal", nullable = false)
+    @Builder.Default
+    private boolean esPrincipal = false;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "etapa_contacto_id",
-            foreignKey = @ForeignKey(name = "fk_cliente_contacto_etapa"))
-    private CatEtapaContacto etapaContacto;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "origen_contacto_id",
-            foreignKey = @ForeignKey(name = "fk_cliente_contacto_origen"))
-    private CatOrigenContacto origenContacto;
-
-    @Column(name = "linkedin_url", length = 200)
-    private String linkedinUrl;
-
-    @Column(name = "zona_horaria", length = 40)
-    private String zonaHoraria;
-
-    @Column(name = "consentimiento_email", nullable = false)
-    private boolean consentimientoEmail = false;
-
-    @Column(name = "consentimiento_sms", nullable = false)
-    private boolean consentimientoSms = false;
-
+    
     @Column(nullable = false)
+    @Builder.Default
     private boolean activo = true;
 
-    @Column(name = "creado_en", insertable = false, updatable = false,
-            columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    @CreationTimestamp 
+    @Column(name = "creado_en", updatable = false, nullable = false)
     private LocalDateTime creadoEn;
 
-    @Column(name = "ultima_actualizacion", nullable = false)
-    @UpdateTimestamp
+    @UpdateTimestamp 	@Column(name = "ultima_actualizacion", insertable = false, updatable = false)
     private LocalDateTime ultimaActualizacion;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cliente_id",
-            foreignKey = @ForeignKey(name = "fk_cliente_contacto_cliente"))
-    private Cliente cliente;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "cliente_id", nullable = false)
+	private Cliente cliente;
 }
+
