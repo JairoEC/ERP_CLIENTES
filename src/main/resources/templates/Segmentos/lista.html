@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{shared/_layout :: head('Lista de Segmentos')}"></head>
+
+<body>
+
+    <header th:replace="~{shared/_layout :: navbar}"></header>
+
+    <div class="container mt-4">
+        <h1>✨ Lista de Segmentos de Clientes</h1>
+        <hr/>
+        
+        <a href="#" class="btn btn-primary mb-3">Nuevo Segmento</a>
+
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="segmento : ${misSegmentos}">
+                    <td th:text="${segmento.segmentoId}"></td>
+                    <td th:text="${segmento.nombre}"></td>
+                    <td th:text="${segmento.descripcion}"></td>
+                    <td>
+                        <a href="#" class="btn btn-warning btn-sm">Editar</a>
+                        <a href="#" class="btn btn-danger btn-sm">Eliminar</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div> <div th:replace="~{shared/_layout :: footer-scripts}"></div>
+
+</body>
+</html>
